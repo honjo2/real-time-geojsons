@@ -1,36 +1,29 @@
-# This is a basic workflow to help you get started with Actions
+name: Test
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    paths:
+      - '**.geojson'
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+env:
+  # プルリクエストのターゲットブランチ
+  TARGET_BRANCH: ${{ github.base_ref }}
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  test:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: 'Checkout'
+        uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!2
+      # git diffをするためにターゲットブランチをフェッチする
+      - name: 'Fetch'
+        run: git fetch --depth 1 origin ${TARGET_BRANCH}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: 'echo'
         run: |
-          echo Add other actions to build,2
-          echo test, and deploy your project.2
+          # ターゲットブランチとHEAD間で、追加,変更されたgeojsonファイルのパスを取得してループ処理
+          for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*.geojson") ; do
+            # ここで任意の処理をする
+            echo ${file}
+          done
