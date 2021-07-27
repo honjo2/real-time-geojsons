@@ -26,7 +26,8 @@ jobs:
 
       - name: 'echo'
         run: |
-          echo "aaa2"
+          echo "aaa3"
+          echo ${TARGET_BRANCH}
           # ターゲットブランチとHEAD間で、追加,変更されたgeojsonファイルのパスを取得してループ処理
           # for file in $(git diff origin/${TARGET_BRANCH} HEAD --diff-filter=AM --name-only -- "*.geojson") ; do
           #   echo ${file}
